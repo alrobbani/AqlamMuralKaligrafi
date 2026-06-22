@@ -1,0 +1,61 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "postgresql" // Ganti dari sqlserver ke postgresql
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") // Tambahkan baris ini khusus untuk Supabase
+}
+
+/// Model untuk menyimpan data karya seni yang dipajang di Galeri Publik
+model Portfolio {
+  id          String   @id @default(uuid())
+  title       String
+  category    String
+  location    String
+  material    String
+  imageUrl    String
+  createdAt   DateTime @default(now())
+}
+
+/// Model multifungsi untuk pencatatan pesanan internal admin & penampung formulir konsultasi pelanggan
+model Order {
+  id               Int      @id @default(autoincrement())
+  nama             String
+  whatsapp         String
+  tipeProyek       String
+  catatan          String?
+  status           String   @default("Pending")
+  totalHarga       Int      @default(0)
+  jumlahDP         Int      @default(0)
+  statusPembayaran String   @default("Belum_Bayar")
+  createdAt        DateTime @default(now())
+}
+
+// Model User (Aktor: Customer, Admin, Owner)
+model User {
+  id        String   @id @default(uuid())
+  nama      String
+  email     String   @unique
+  password  String
+  // Nilai role hanya boleh: 'customer', 'admin', atau 'owner'
+  role      String   @default("customer")
+  createdAt DateTime @default(now())
+
+  forms     FormKonsultasi[]
+}
+
+// Model FormKonsultasi (Data Pesanan)
+model FormKonsultasi {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  namaProyek   String
+  alamatProyek String
+  deskripsi    String
+  status       String   @default("pending")
+  createdAt    DateTime @default(now())
+}
