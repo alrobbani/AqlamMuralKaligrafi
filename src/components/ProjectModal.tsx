@@ -20,7 +20,6 @@ export interface ProjectForModal {
   image: string;
   klien?: string;
   tahun?: string;
-  luas?: string;
   deskripsi?: string;
 }
 
@@ -466,8 +465,8 @@ export default function ProjectModal({
             </div>
           )}
 
-          {/* Meta: Tahun & Luas */}
-          {(proyek.tahun || proyek.luas) && (
+          {/* Meta: Tahun */}
+          {proyek.tahun && (
             <div
               style={{
                 display: "flex",
@@ -478,62 +477,32 @@ export default function ProjectModal({
                 borderBottom: "1px solid #e5e7eb",
               }}
             >
-              {proyek.tahun && (
-                <div>
-                  <span
-                    style={{
-                      display: "block",
-                      fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
-                      fontSize: "11px",
-                      fontWeight: 600,
-                      letterSpacing: "1px",
-                      textTransform: "uppercase",
-                      color: "#9ca3af",
-                      marginBottom: "2px",
-                    }}
-                  >
-                    Tahun
-                  </span>
-                  <span
-                    style={{
-                      fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
-                      fontSize: "15px",
-                      fontWeight: 600,
-                      color: "#042f2e",
-                    }}
-                  >
-                    {proyek.tahun}
-                  </span>
-                </div>
-              )}
-              {proyek.luas && (
-                <div>
-                  <span
-                    style={{
-                      display: "block",
-                      fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
-                      fontSize: "11px",
-                      fontWeight: 600,
-                      letterSpacing: "1px",
-                      textTransform: "uppercase",
-                      color: "#9ca3af",
-                      marginBottom: "2px",
-                    }}
-                  >
-                    Luas
-                  </span>
-                  <span
-                    style={{
-                      fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
-                      fontSize: "15px",
-                      fontWeight: 600,
-                      color: "#042f2e",
-                    }}
-                  >
-                    {proyek.luas}
-                  </span>
-                </div>
-              )}
+              <div>
+                <span
+                  style={{
+                    display: "block",
+                    fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+                    fontSize: "11px",
+                    fontWeight: 600,
+                    letterSpacing: "1px",
+                    textTransform: "uppercase",
+                    color: "#9ca3af",
+                    marginBottom: "2px",
+                  }}
+                >
+                  Tahun Pengerjaan
+                </span>
+                <span
+                  style={{
+                    fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+                    fontSize: "15px",
+                    fontWeight: 600,
+                    color: "#042f2e",
+                  }}
+                >
+                  {proyek.tahun}
+                </span>
+              </div>
             </div>
           )}
 

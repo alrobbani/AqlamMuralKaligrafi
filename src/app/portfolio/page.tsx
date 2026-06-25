@@ -4,6 +4,9 @@ import PortfolioView from "@/components/PortfolioView";
 import FormKonsultasi from "@/components/FormKonsultasi";
 import type { Metadata } from "next";
 import Image from "next/image";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 export const metadata: Metadata = {
   title: "Portofolio — PT Aqlam Mural Kaligrafi",
@@ -18,7 +21,11 @@ export const metadata: Metadata = {
    - Wraps with <Navbar /> dan <Footer />
 ───────────────────────────────────────────────────────────── */
 
-export default function PortfolioPage() {
+export default async function PortfolioPage() {
+  const portfolios = await prisma.portfolio.findMany({
+    orderBy: { id: "asc" },
+  });
+
   return (
     <main className="bg-stone-50" style={{ minHeight: "100vh" }}>
       {/* Navbar sticky — tetap terlihat di scroll */}
@@ -43,7 +50,7 @@ export default function PortfolioPage() {
       </section>
 
       {/* Konten interaktif galeri (client component) */}
-      <PortfolioView />
+      <PortfolioView portfolios={portfolios} />
 
       {/* Form konsultasi — mendorong konversi setelah menjelajahi galeri */}
       <FormKonsultasi />

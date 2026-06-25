@@ -11,12 +11,14 @@ datasource db {
 
 /// Model untuk menyimpan data karya seni yang dipajang di Galeri Publik
 model Portfolio {
-  id          String   @id @default(uuid())
+  id          String   @id @default(cuid())
   title       String
   category    String
   location    String
-  material    String
   imageUrl    String
+  client      String
+  year        String
+  description String   @db.Text
   createdAt   DateTime @default(now())
 }
 

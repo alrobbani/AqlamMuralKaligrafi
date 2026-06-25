@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import ProjectModal from "@/components/ProjectModal";
 import type { ProjectForModal } from "@/components/ProjectModal";
+import type { Portfolio } from "@prisma/client";
 
 /* ─────────────────────────────────────────────────────────────
    PortfolioView — Client Component (interactive filter + search + lightbox)
@@ -18,238 +19,7 @@ import type { ProjectForModal } from "@/components/ProjectModal";
 /* ── Tipe Data ── */
 type Kategori = "Semua" | "Kaligrafi Masjid" | "Mural Komersial" | "Hunian Pribadi" | "Ornamen Islami";
 
-interface ProyekItem {
-  id: string;
-  judul: string;
-  klien: string;
-  lokasi: string;
-  kategori: Exclude<Kategori, "Semua">;
-  tahun: string;
-  luas?: string;
-  gradient: string;
-  image: string;
-  tinggi: "pendek" | "sedang" | "tinggi";
-  deskripsi?: string;
-}
 
-/* ── Data Dummy 16 Proyek ── */
-const PROYEK_DATA: ProyekItem[] = [
-  // Kaligrafi Masjid
-  {
-    id: "prj-001",
-    judul: "Kaligrafi Mihrab Masjid Al-Ikhlas",
-    klien: "DKM Masjid Al-Ikhlas",
-    lokasi: "Pasar Kemis, Tangerang",
-    kategori: "Kaligrafi Masjid",
-    tahun: "2024",
-    luas: "180 m²",
-    gradient: "linear-gradient(160deg, #001520 0%, #013D4D 40%, #025E73 75%, #0A9BAF 100%)",
-    image: "/images/porto-kaligrafi.jpg",
-    tinggi: "tinggi",
-    deskripsi: "Kaligrafi mihrab utama dengan khat Tsuluts dan ornamen arabesk emas. Menghiasi dinding kiblat masjid dengan keindahan sakral.",
-  },
-  {
-    id: "prj-002",
-    judul: "Kaligrafi Kubah Masjid Agung An-Nur",
-    klien: "Masjid Agung An-Nur",
-    lokasi: "Kota Tangerang",
-    kategori: "Kaligrafi Masjid",
-    tahun: "2024",
-    luas: "96 m²",
-    gradient: "linear-gradient(160deg, #001520 0%, #025E73 55%, #0A9BAF 100%)",
-    image: "/images/porto-kaligrafi2.jpg",
-    tinggi: "sedang",
-    deskripsi: "Pengerjaan kaligrafi kubah masjid dengan motif bintang geometris dan kaligrafi Asmaul Husna mengelilingi puncak kubah.",
-  },
-  {
-    id: "prj-003",
-    judul: "Kaligrafi Dinding Masjid Baitul Amin",
-    klien: "DKM Masjid Baitul Amin",
-    lokasi: "Cilegon, Banten",
-    kategori: "Kaligrafi Masjid",
-    tahun: "2023",
-    luas: "28 m²",
-    gradient: "linear-gradient(160deg, #001830 0%, #002D52 45%, #004080 100%)",
-    image: "/images/porto-kaligrafi3.jpg",
-    tinggi: "pendek",
-    deskripsi: "Kaligrafi mihrab dengan komposisi simetris menggunakan khat Tsuluts. Area dinding kiblat dihiasi ornamen floral yang mengalir harmonis.",
-  },
-  {
-    id: "prj-004",
-    judul: "Kaligrafi Asmaul Husna Masjid Al-Falah",
-    klien: "Masjid Jami Al-Falah",
-    lokasi: "Serang, Banten",
-    kategori: "Kaligrafi Masjid",
-    tahun: "2024",
-    luas: "96 m²",
-    gradient: "linear-gradient(155deg, #001A15 0%, #00402D 45%, #008F65 100%)",
-    image: "/images/porto-kaligrafi4.jpg",
-    tinggi: "tinggi",
-    deskripsi: "Penulisan 99 Asmaul Husna pada dinding masjid dengan khat Naskhi yang jelas terbaca. Setiap nama dikelilingi ornamen arabesque yang elegan.",
-  },
-
-  // Mural Komersial
-  {
-    id: "prj-005",
-    judul: "Mural Dinding 3D Tepian Kafe",
-    klien: "Kafe Tepian BSD",
-    lokasi: "BSD City, Tangerang Selatan",
-    kategori: "Mural Komersial",
-    tahun: "2025",
-    luas: "42 m²",
-    gradient: "linear-gradient(145deg, #021205 0%, #0A3D15 45%, #1E8C35 100%)",
-    image: "/images/porto-mural.jpg",
-    tinggi: "sedang",
-    deskripsi: "Mural tiga dimensi bertema botanical tropis yang menghiasi dinding utama kafe. Teknik trompe-l'oeil menciptakan ilusi kedalaman yang memukau pengunjung.",
-  },
-  {
-    id: "prj-006",
-    judul: "Mural Fasad Restoran Rempah",
-    klien: "Restoran Rempah Nusantara",
-    lokasi: "Kebon Jeruk, Jakarta Barat",
-    kategori: "Mural Komersial",
-    tahun: "2025",
-    luas: "55 m²",
-    gradient: "linear-gradient(150deg, #1A0800 0%, #6B2800 50%, #E06820 100%)",
-    image: "/images/porto-mural2.jpg",
-    tinggi: "tinggi",
-    deskripsi: "Mural fasad eksterior yang menggambarkan perjalanan rempah nusantara. Warna-warna hangat menciptakan suasana mengundang bagi pengunjung restoran.",
-  },
-  {
-    id: "prj-007",
-    judul: "Mural Lobi Kantor PT Maju Bersama",
-    klien: "PT Maju Bersama",
-    lokasi: "Sudirman, Jakarta Pusat",
-    kategori: "Mural Komersial",
-    tahun: "2025",
-    luas: "30 m²",
-    gradient: "linear-gradient(145deg, #0D0D0D 0%, #1A1A2E 45%, #0F3460 100%)",
-    image: "/images/porto-mural3.jpg",
-    tinggi: "pendek",
-    deskripsi: "Feature wall lobi kantor korporat dengan desain abstrak geometris. Kombinasi akrilik dan metallic paint menciptakan kesan profesional dan modern.",
-  },
-  {
-    id: "prj-008",
-    judul: "Mural Kreatif Coworking Space",
-    klien: "SpaceHub BSD",
-    lokasi: "Gading Serpong, Tangerang",
-    kategori: "Mural Komersial",
-    tahun: "2024",
-    luas: "35 m²",
-    gradient: "linear-gradient(150deg, #021A05 0%, #0A5C1A 55%, #12A830 100%)",
-    image: "/images/porto-mural4.jpg",
-    tinggi: "sedang",
-    deskripsi: "Mural bertema botanical tropis dengan detail daun dan bunga eksotis. Warna-warna segar menghidupkan suasana ruangan coworking.",
-  },
-
-  // Ornamen Islami
-  {
-    id: "prj-009",
-    judul: "Ornamen Geometris Mihrab Al-Ikhlas",
-    klien: "DKM Masjid Al-Ikhlas",
-    lokasi: "Pasar Kemis, Tangerang",
-    kategori: "Ornamen Islami",
-    tahun: "2024",
-    luas: "64 m²",
-    gradient: "linear-gradient(135deg, #1A1400 0%, #5C4500 45%, #D4AF37 100%)",
-    image: "/images/porto-ornamen.jpg",
-    tinggi: "sedang",
-    deskripsi: "Panel ornamen geometris dengan pola bintang delapan sudut khas seni Islam. Dikerjakan dengan teknik ukir timbul dan gilding emas, menciptakan dimensi visual yang kaya.",
-  },
-  {
-    id: "prj-010",
-    judul: "Ornamen Arabesk Pintu Utama Masjid",
-    klien: "DKM Masjid At-Taqwa",
-    lokasi: "Serpong, Tangerang Selatan",
-    kategori: "Ornamen Islami",
-    tahun: "2023",
-    luas: "22 m²",
-    gradient: "linear-gradient(135deg, #1A0A00 0%, #703A00 45%, #D4780A 100%)",
-    image: "/images/porto-ornamen2.jpg",
-    tinggi: "sedang",
-    deskripsi: "Ornamen arabesk pada kusen dan daun pintu masjid. Detail ukiran tangan dipadukan dengan cat emas untuk aksen mewah nan sakral.",
-  },
-  {
-    id: "prj-011",
-    judul: "Ornamen Kerawang Masjid Istiqomah",
-    klien: "DKM Masjid Istiqomah",
-    lokasi: "Cikupa, Tangerang",
-    kategori: "Ornamen Islami",
-    tahun: "2024",
-    luas: "50 m²",
-    gradient: "linear-gradient(145deg, #1A0A00 0%, #8B4513 45%, #C4820A 100%)",
-    image: "/images/porto-ornamen3.jpg",
-    tinggi: "tinggi",
-    deskripsi: "Ornamen lengkung dan medallion pada mihrab dan dinding masjid. Detail ukiran tangan dengan aksen emas 24 karat.",
-  },
-  {
-    id: "prj-012",
-    judul: "Ornamen GRC Kubah Luar Masjid",
-    klien: "DKM Masjid Jami Baiturrahman",
-    lokasi: "Balaraja, Tangerang",
-    kategori: "Ornamen Islami",
-    tahun: "2025",
-    luas: "120 m²",
-    gradient: "linear-gradient(145deg, #1A0A00 0%, #8B4513 45%, #C4820A 100%)",
-    image: "/images/porto-ornamen4.jpg",
-    tinggi: "tinggi",
-    deskripsi: "Pengerjaan panel ornamen GRC bermotif islami geometris pada kubah bagian luar masjid. Kuat, indah, dan tahan cuaca ekstrim.",
-  },
-
-  // Hunian Pribadi
-  {
-    id: "prj-013",
-    judul: "Mural Kamar Tidur Villa Bukit",
-    klien: "Tn. Arif Widodo",
-    lokasi: "Puncak, Bogor",
-    kategori: "Hunian Pribadi",
-    tahun: "2025",
-    luas: "18 m²",
-    gradient: "linear-gradient(140deg, #0A001A 0%, #2D0A5C 45%, #8A2EC0 100%)",
-    image: "/images/porto-hunian.jpg",
-    tinggi: "sedang",
-    deskripsi: "Mural kamar tidur utama dengan nuansa langit malam berbintang. Efek glow-in-the-dark pada bintang memberikan pengalaman visual unik di malam hari.",
-  },
-  {
-    id: "prj-014",
-    judul: "Mural Ruang Keluarga Minimalis Bintaro",
-    klien: "Ny. Sari Pratiwi",
-    lokasi: "Bintaro, Tangerang Selatan",
-    kategori: "Hunian Pribadi",
-    tahun: "2024",
-    luas: "12 m²",
-    gradient: "linear-gradient(150deg, #001A1A 0%, #00404A 50%, #008A9A 100%)",
-    image: "/images/porto-hunian2.jpg",
-    tinggi: "pendek",
-    deskripsi: "Mural minimalis bergaya Japandi untuk ruang keluarga. Warna earthy tone dan motif alam menciptakan suasana tenang dan hangat.",
-  },
-  {
-    id: "prj-015",
-    judul: "Mural Kamar Anak Tema Hutan Tropis",
-    klien: "Kel. Budiman Santoso",
-    lokasi: "Depok, Jawa Barat",
-    kategori: "Hunian Pribadi",
-    tahun: "2025",
-    luas: "14 m²",
-    gradient: "linear-gradient(140deg, #001A05 0%, #003D10 45%, #008025 100%)",
-    image: "/images/porto-hunian3.jpg",
-    tinggi: "sedang",
-    deskripsi: "Mural kamar anak dengan tema hutan tropis yang playful. Karakter hewan lucu dan warna cerah menciptakan ruang bermain imajinatif bagi si kecil.",
-  },
-  {
-    id: "prj-016",
-    judul: "Mural Klasik Ruang Tamu Mewah",
-    klien: "Bpk. Hendra Wijaya",
-    lokasi: "Menteng, Jakarta Pusat",
-    kategori: "Hunian Pribadi",
-    tahun: "2024",
-    luas: "25 m²",
-    gradient: "linear-gradient(135deg, #0A0A1A 0%, #1A2A6C 50%, #2D4AB5 100%)",
-    image: "/images/porto-hunian4.jpg",
-    tinggi: "tinggi",
-    deskripsi: "Mural dinding ruang tamu hunian mewah bertema pemandangan alam klasik eropa klasik. Dikerjakan dengan detail kuas lukis handmade berkualitas tinggi.",
-  },
-];
 
 const KATEGORI_FILTER: Kategori[] = [
   "Semua",
@@ -260,7 +30,7 @@ const KATEGORI_FILTER: Kategori[] = [
 ];
 
 /* ── Komponen Utama ── */
-export default function PortfolioView() {
+export default function PortfolioView({ portfolios }: { portfolios: Portfolio[] }) {
   const [aktifKategori, setAktifKategori] = useState<Kategori>("Semua");
   const [query, setQuery] = useState("");
 
@@ -270,16 +40,16 @@ export default function PortfolioView() {
 
   const hasil = useMemo(() => {
     const q = query.toLowerCase().trim();
-    return PROYEK_DATA.filter((p) => {
-      const cocokKategori = aktifKategori === "Semua" || p.kategori === aktifKategori;
+    return portfolios.filter((p) => {
+      const cocokKategori = aktifKategori === "Semua" || p.category === aktifKategori;
       const cocokQuery =
         !q ||
-        p.judul.toLowerCase().includes(q) ||
-        p.lokasi.toLowerCase().includes(q) ||
-        p.klien.toLowerCase().includes(q);
+        p.title.toLowerCase().includes(q) ||
+        p.location.toLowerCase().includes(q) ||
+        p.client.toLowerCase().includes(q);
       return cocokKategori && cocokQuery;
     });
-  }, [aktifKategori, query]);
+  }, [aktifKategori, query, portfolios]);
 
   /* ── Fungsi Navigasi Modal ── */
   const handleOpenModal = useCallback((index: number) => {
@@ -306,17 +76,29 @@ export default function PortfolioView() {
   const projectsForModal: ProjectForModal[] = useMemo(
     () =>
       hasil.map((p) => ({
-        judul: p.judul,
-        kategori: p.kategori,
-        lokasi: p.lokasi,
-        image: p.image,
-        klien: p.klien,
-        tahun: p.tahun,
-        luas: p.luas,
-        deskripsi: p.deskripsi,
+        judul: p.title,
+        kategori: p.category,
+        lokasi: p.location,
+        image: p.imageUrl,
+        klien: p.client,
+        tahun: p.year,
+        deskripsi: p.description,
       })),
     [hasil],
   );
+
+  // Split filtered hasil into 4 columns with original index tracking
+  const columns = useMemo(() => {
+    const hasilDenganIndex = hasil.map((proyek, index) => ({ proyek, index }));
+    return [
+      hasilDenganIndex.filter((_, i) => i % 4 === 0),
+      hasilDenganIndex.filter((_, i) => i % 4 === 1),
+      hasilDenganIndex.filter((_, i) => i % 4 === 2),
+      hasilDenganIndex.filter((_, i) => i % 4 === 3),
+    ];
+  }, [hasil]);
+
+  const [col1, col2, col3, col4] = columns;
 
   return (
     <div className="bg-stone-50" style={{ minHeight: "100vh" }}>
@@ -402,7 +184,7 @@ export default function PortfolioView() {
             }}
           >
             {[
-              { angka: `${PROYEK_DATA.length}`, label: "Proyek Ditampilkan" },
+              { angka: `${portfolios.length}`, label: "Proyek Ditampilkan" },
               { angka: "4", label: "Kategori Layanan" },
               { angka: "200+", label: "Total Proyek Selesai" },
             ].map((s) => (
@@ -485,14 +267,43 @@ export default function PortfolioView() {
           {hasil.length === 0 ? (
             <EmptyState onReset={() => { setQuery(""); setAktifKategori("Semua"); }} />
           ) : (
-            <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6 p-4">
-              {hasil.map((proyek, index) => (
-                <ProyekCard
-                  key={proyek.id}
-                  proyek={proyek}
-                  onCardClick={() => handleOpenModal(index)}
-                />
-              ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="flex flex-col gap-4">
+                {col1.map(({ proyek, index }) => (
+                  <ProyekCard
+                    key={proyek.id}
+                    proyek={proyek}
+                    onCardClick={() => handleOpenModal(index)}
+                  />
+                ))}
+              </div>
+              <div className="flex flex-col gap-4">
+                {col2.map(({ proyek, index }) => (
+                  <ProyekCard
+                    key={proyek.id}
+                    proyek={proyek}
+                    onCardClick={() => handleOpenModal(index)}
+                  />
+                ))}
+              </div>
+              <div className="flex flex-col gap-4">
+                {col3.map(({ proyek, index }) => (
+                  <ProyekCard
+                    key={proyek.id}
+                    proyek={proyek}
+                    onCardClick={() => handleOpenModal(index)}
+                  />
+                ))}
+              </div>
+              <div className="flex flex-col gap-4">
+                {col4.map(({ proyek, index }) => (
+                  <ProyekCard
+                    key={proyek.id}
+                    proyek={proyek}
+                    onCardClick={() => handleOpenModal(index)}
+                  />
+                ))}
+              </div>
             </div>
           )}
         </section>
@@ -671,7 +482,7 @@ function ProyekCard({
   proyek,
   onCardClick,
 }: {
-  proyek: ProyekItem;
+  proyek: Portfolio;
   onCardClick: () => void;
 }) {
   const [hovered, setHovered] = useState(false);
@@ -681,7 +492,7 @@ function ProyekCard({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={onCardClick}
-      className="relative overflow-hidden bg-stone-50 border border-stone-200 break-inside-avoid mb-6 group cursor-pointer z-0"
+      className="relative overflow-hidden rounded-xl group break-inside-avoid mb-0 cursor-pointer bg-stone-50 border border-stone-200 z-0"
     >
       {/* ── Artwork Area ── */}
       <div
@@ -692,13 +503,23 @@ function ProyekCard({
         }}
       >
         <Image
-          src={proyek.image}
-          alt={proyek.judul}
-          width={proyek.tinggi === "pendek" ? 800 : proyek.tinggi === "tinggi" ? 600 : 800}
-          height={proyek.tinggi === "pendek" ? 600 : proyek.tinggi === "tinggi" ? 800 : 800}
+          src={proyek.imageUrl}
+          alt={proyek.title}
+          width={800}
+          height={800}
           className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-110 z-0"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
+        <div
+          className="absolute inset-0 bg-slate-950/70 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-center items-center text-center p-4 text-white z-10"
+        >
+          <h3 className="font-bold text-lg sm:text-xl mb-2" style={{ color: "#D4AF37" }}>
+            {proyek.title}
+          </h3>
+          <p className="text-white text-xs sm:text-sm tracking-wide uppercase">
+            {proyek.category} &bull; {proyek.location}
+          </p>
+        </div>
         {/* Pola dekoratif tipis */}
         <div
           aria-hidden="true"
@@ -722,6 +543,7 @@ function ProyekCard({
             borderLeft: "2px solid rgba(212,175,55,0.50)",
             opacity: hovered ? 1 : 0,
             transition: "opacity 0.3s ease",
+            zIndex: 20,
           }}
         />
         <div
@@ -736,54 +558,9 @@ function ProyekCard({
             borderRight: "2px solid rgba(212,175,55,0.50)",
             opacity: hovered ? 1 : 0,
             transition: "opacity 0.3s ease",
+            zIndex: 20,
           }}
         />
-      </div>
-
-      {/* ── Desktop Overlay: Hover-only (lg ke atas) ── */}
-      <div
-        className="hidden lg:flex absolute inset-0 z-20 bg-teal-950/80 opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300 flex-col items-center justify-center text-center p-4 pointer-events-none"
-      >
-        <p className="text-white font-bold text-lg sm:text-xl">
-          {proyek.judul}
-        </p>
-        <p className="text-[#BFA071] md:text-sm mt-2">
-          {proyek.lokasi}
-        </p>
-      </div>
-
-      {/* ── Mobile/Tablet Overlay: Permanent (di bawah lg) ── */}
-      <div
-        className="flex lg:hidden absolute bottom-0 left-0 right-0 z-10 flex-col"
-        style={{
-          background:
-            "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.50) 60%, transparent 100%)",
-          padding: "36px 14px 14px",
-        }}
-      >
-        <p
-          style={{
-            fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
-            fontSize: "15px",
-            fontWeight: 600,
-            lineHeight: 1.3,
-            color: "#FFFFFF",
-            margin: "0 0 4px",
-          }}
-        >
-          {proyek.judul}
-        </p>
-        <p
-          style={{
-            fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
-            fontSize: "12px",
-            fontWeight: 500,
-            color: "#BFA071",
-            margin: 0,
-          }}
-        >
-          {proyek.lokasi}
-        </p>
       </div>
     </div>
   );
